@@ -4,15 +4,21 @@ bool IsButtonUp(void);
 void SetLedHIGH(void);
 void SetLedLOW(void);
 bool IsLedHIGH(void);
+void SetAllLEDsOff(void);
 
 bool stillPressed = false;
 int currentLEDActive = 0;
+unsigned long lastMillis = 0;
+const long interval = 200;
 /*  Controlando botões e leds simples
  * O objetivo é controlar o led da placa a partir do botão da placa
  */
 void setup() {
-//  GPIO_PORTJ_AHB_LOCK_R = 0x4C4F434B;  // chave mágica
-//  GPIO_PORTJ_AHB_CR_R |= (1 << 0);     // libera controle de PJ0
+  GPIO_PORTJ_AHB_LOCK_R = 0x4C4F434B;  // chave mágica
+  GPIO_PORTF_AHB_LOCK_R = 0x4C4F434B;  // chave mágica
+  GPIO_PORTJ_AHB_CR_R |= (1 << 0);     // libera controle de PJ0
+  GPIO_PORTF_AHB_CR_R |= (1 << 0);         // libera controle de PF0
+  
   // put your setup code here, to run once:
   // Ativando os clocks do botão e do led
   SYSCTL_RCGCGPIO_R |= (1 << 5);
@@ -39,8 +45,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(!IsButtonUp() && !stillPressed)
+  unsigned long millisNow = millis();
+  if(!IsButtonUp() && !stillPressed && (millisNow - lastMillis >= interval))
   {
+    lastMillis = millisNow;
     stillPressed = true;
 
     if(currentLEDActive == 3)
@@ -55,34 +63,21 @@ void loop() {
   {
     stillPressed = false;
   }
-
+  
+  SetAllLEDsOff();
   switch(currentLEDActive)
   {
-    case 0:
-      SetAllLEDsOff();
-      GPIO_PORTN_DATA_R |= (1 << 1);
-    break;
-    case 1:
-      SetAllLEDsOff();
-      GPIO_PORTN_DATA_R |= (1 << 0);
-    break; 
-    case 2:
-      SetAllLEDsOff();
-      GPIO_PORTF_AHB_DATA_R |= (1 << 4);
-    break;
-    case 3:
-      SetAllLEDsOff();
-      GPIO_PORTF_AHB_DATA_R |= (1 << 0);
-    break;
+    case 0: GPIO_PORTN_DATA_R |= (1 << 1); break;
+    case 1: GPIO_PORTN_DATA_R |= (1 << 0); break; 
+    case 2: GPIO_PORTF_AHB_DATA_R |= (1 << 4); break;
+    case 3: GPIO_PORTF_AHB_DATA_R |= (1 << 0); break;
   }
 }
 
 void SetAllLEDsOff(void)
 {
-    GPIO_PORTN_DATA_R &= ~(1 << 1);
-    GPIO_PORTN_DATA_R &= ~(1 << 0);
-    GPIO_PORTF_AHB_DATA_R &= ~(1 << 0);
-    GPIO_PORTF_AHB_DATA_R &= ~(1 << 4);
+    GPIO_PORTN_DATA_R &= ~((1 << 1) | (1 << 0));
+    GPIO_PORTF_AHB_DATA_R &= ~((1 << 0) | (1 << 4));
 }
 bool IsButtonUp(void)
 {

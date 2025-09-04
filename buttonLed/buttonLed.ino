@@ -5,6 +5,8 @@ void SetLedHIGH(void);
 void SetLedLOW(void);
 bool IsLedHIGH(void);
 
+bool stillPressed = false;
+int currentLEDActive = 0;
 /*  Controlando botões e leds simples
  * O objetivo é controlar o led da placa a partir do botão da placa
  */
@@ -15,32 +17,36 @@ void setup() {
   // Ativando os clocks do botão e do led
   SYSCTL_RCGCGPIO_R |= (1 << 5);
   SYSCTL_RCGCGPIO_R |= (1 << 8);
+  SYSCTL_RCGCGPIO_R |= (1 << 12);
 
-  // Definir o led como saída:
-  GPIO_PORTF_AHB_DIR_R |= (1 << 0); // PF0 é o LED
-
+  // Definir os leds como saída:
+  GPIO_PORTF_AHB_DIR_R |= (1 << 0); // PF0
+  GPIO_PORTF_AHB_DIR_R |= (1 << 4); // PF4
+  GPIO_PORTN_DIR_R |= (1 << 0); // PN0
+  GPIO_PORTN_DIR_R |= (1 << 1); // PN1
+  
   // Definir o botão como entrada:
   GPIO_PORTJ_AHB_DIR_R &= ~(1 << 0); // PJ0 é o Botão
 
   // Definir os dois como digital:
-  GPIO_PORTF_AHB_DEN_R |= (1 << 0);
-  GPIO_PORTJ_AHB_DEN_R |= (1 << 0);
+  GPIO_PORTF_AHB_DEN_R |= (1 << 0) | (1 << 4); // PF0 e PF4
+  GPIO_PORTN_DEN_R |= (1 << 0) | (1 << 1); // PN0 e PN1
+  GPIO_PORTJ_AHB_DEN_R |= (1 << 0); // Botão
 
   // Definir o botão como pull-up
   GPIO_PORTJ_AHB_PUR_R |= (1 << 0);
 }
 
-bool stillPressed = false;
 void loop() {
   // put your main code here, to run repeatedly:
   if(!IsButtonUp() && !stillPressed)
   {
     stillPressed = true;
-    
-    if(IsLedHIGH())    
-      SetLedLOW();    
-    else    
-      SetLedHIGH();
+
+    if(currentLEDActive == 3)
+      currentLEDActive = 0;
+    else
+      currentLEDActive++;
       
     // Debounce simples
     for (volatile int i = 0; i < 100000; i++);
@@ -49,23 +55,36 @@ void loop() {
   {
     stillPressed = false;
   }
+
+  switch(currentLEDActive)
+  {
+    case 0:
+      SetAllLEDsOff();
+      GPIO_PORTN_DATA_R |= (1 << 1);
+    break;
+    case 1:
+      SetAllLEDsOff();
+      GPIO_PORTN_DATA_R |= (1 << 0);
+    break; 
+    case 2:
+      SetAllLEDsOff();
+      GPIO_PORTF_AHB_DATA_R |= (1 << 4);
+    break;
+    case 3:
+      SetAllLEDsOff();
+      GPIO_PORTF_AHB_DATA_R |= (1 << 0);
+    break;
+  }
 }
 
-bool IsLedHIGH(void)
+void SetAllLEDsOff(void)
 {
-  return GPIO_PORTF_AHB_DATA_R & (1 << 0);
+    GPIO_PORTN_DATA_R &= ~(1 << 1);
+    GPIO_PORTN_DATA_R &= ~(1 << 0);
+    GPIO_PORTF_AHB_DATA_R &= ~(1 << 0);
+    GPIO_PORTF_AHB_DATA_R &= ~(1 << 4);
 }
 bool IsButtonUp(void)
 {
   return GPIO_PORTJ_AHB_DATA_R & (1 << 0);
-}
-
-void SetLedHIGH(void)
-{
-  GPIO_PORTF_AHB_DATA_R |= (1 << 0);
-}
-
-void SetLedLOW(void)
-{
-  GPIO_PORTF_AHB_DATA_R &= ~(1 << 0);
 }

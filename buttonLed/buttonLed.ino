@@ -1,4 +1,5 @@
 #include "tm4c1294ncpdt.h"
+#define GPIO_LOCK_KEY 0x4C4F434B
 
 bool IsButtonUp(void);
 void SetLedHIGH(void);
@@ -14,8 +15,8 @@ const long interval = 200;
  * O objetivo é controlar o led da placa a partir do botão da placa
  */
 void setup() {
-  GPIO_PORTJ_AHB_LOCK_R = 0x4C4F434B;  // chave mágica
-  GPIO_PORTF_AHB_LOCK_R = 0x4C4F434B;  // chave mágica
+  GPIO_PORTJ_AHB_LOCK_R = GPIO_LOCK_KEY;  // chave mágica
+  GPIO_PORTF_AHB_LOCK_R = GPIO_LOCK_KEY;  // chave mágica
   GPIO_PORTJ_AHB_CR_R |= (1 << 0);     // libera controle de PJ0
   GPIO_PORTF_AHB_CR_R |= (1 << 0);         // libera controle de PF0
   
@@ -55,9 +56,6 @@ void loop() {
       currentLEDActive = 0;
     else
       currentLEDActive++;
-      
-    // Debounce simples
-    for (volatile int i = 0; i < 100000; i++);
   }
   else if(IsButtonUp() && stillPressed)
   {

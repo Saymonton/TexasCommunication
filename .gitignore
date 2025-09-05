@@ -1,0 +1,105 @@
+# -------------------------------
+# Build results
+# -------------------------------
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+# Arquivos de publicação
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.appxupload
+*.msixupload
+*.msixsym
+*.appxsym
+*.eappx
+*.eappxbundle
+*.msixsym
+*.msixsymbundle
+*.msixsymupload
+
+# Publicação local e profiles
+[Pp]roperties/PublishProfiles/*.pubxml.user
+[Pp]roperties/PublishProfiles/*.pubxml~*
+[Pp]roperties/PublishProfiles/*.backup
+*.publishsettings
+
+# -------------------------------
+# Usuário / IDE
+# -------------------------------
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.rsuser
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.swp
+*~
+
+# -------------------------------
+# .NET
+# -------------------------------
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Arquivos gerados pelo SDK
+*.nuget.props
+*.nuget.targets
+*.nuget.g.props
+*.nuget.g.targets
+
+# Cache do NuGet
+.nuget/packages/
+*.nupkg
+*.snupkg
+*.nuspec
+*.nuget.cache
+
+# -------------------------------
+# Configuração do sistema
+# -------------------------------
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+ARM/
+ARM64/
+*.dbmdl
+*.jfm
+*.pdb
+*.mdb
+
+# -------------------------------
+# Ferramentas adicionais
+# -------------------------------
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Teste / Coverage
+TestResult*/
+*.coverage
+*.coveragexml
+*.testlog
+
+# Logs
+*.log
+
+# -------------------------------
+# Outras proteções
+# -------------------------------
+# JSON de configuração sensível
+appsettings.*.json
+# mas manter o appsettings.json base
+!appsettings.json

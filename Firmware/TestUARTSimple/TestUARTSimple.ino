@@ -1,5 +1,11 @@
 #include "tm4c1294ncpdt.h"
 
+#define HEADER1 0xAA
+#define HEADER2 0x55
+
+#define CMD_GET_STATUS 0x01
+#define CMD_SET_LED    0x02
+
 void BlinkLed()
 {
   unsigned long millisNow = millis();

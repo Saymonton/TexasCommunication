@@ -173,4 +173,10 @@
   <data name="COM_PortName.Text" xml:space="preserve">
     <value>Port name</value>
   </data>
+  <data name="Connect.Text" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Disconnect.Text" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
 </root>

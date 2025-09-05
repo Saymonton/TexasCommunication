@@ -24,6 +24,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock
@@ -35,8 +36,8 @@
                 <ComboBox
                     Grid.Row="0"
                     Grid.Column="2"
-                    DropDownOpened="ComboBoxPortNames_DropDownOpened"
                     Width="100"
+                    DropDownOpened="ComboBoxPortNames_DropDownOpened"
                     ItemsSource="{Binding PortNames}"
                     SelectedItem="{Binding SelectedPortName}" />
 
@@ -58,32 +59,46 @@
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Parity" />
+                    Text="Data Bits" />
                 <ComboBox
                     Grid.Row="2"
+                    Grid.Column="2"
+                    Width="100"
+                    Margin="{StaticResource XSmallTopMargin}"
+                    ItemsSource="{Binding DataBits}"
+                    SelectedItem="{Binding SelectedDataBits}" />
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    Style="{ThemeResource BodyTextBlockStyle}"
+                    Text="Parity" />
+                <ComboBox
+                    Grid.Row="3"
                     Grid.Column="2"
                     Width="100"
                     Margin="{StaticResource XSmallTopMargin}"
                     ItemsSource="{Binding Parities}"
                     SelectedItem="{Binding SelectedParity}" />
                 <TextBlock
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{ThemeResource BodyTextBlockStyle}"
                     Text="StopBits" />
                 <ComboBox
-                    Grid.Row="3"
+                    Grid.Row="4"
                     Grid.Column="2"
                     Width="100"
                     Margin="{StaticResource XSmallTopMargin}"
                     ItemsSource="{Binding StopBits}"
                     SelectedItem="{Binding SelectedStopBits}" />
                 <Button
-                    Grid.Row="4"
+                    Grid.Row="5"
                     Grid.Column="0"
                     Margin="{StaticResource XSmallTopMargin}"
-                    Content="Connect" />
+                    Command="{Binding ConnectCOMCommand}"
+                    Content="{Binding BtnConnectText}" />
             </Grid>
         </Expander>
 

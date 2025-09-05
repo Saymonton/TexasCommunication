@@ -64,7 +64,7 @@ void setup() {
 }
 
 void loop() {
-  ReadSerial();
+  ReadSerial(); 
 
   // put your main code here, to run repeatedly:
   unsigned long millisNow = millis();
@@ -77,6 +77,7 @@ void loop() {
       currentLEDActive = 0;
     else
       currentLEDActive++;
+    sendPacket(CMD_GET_STATUS, (byte*)&currentLEDActive, 1);
   }
   else if (IsButtonUp() && stillPressed)
   {

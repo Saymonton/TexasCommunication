@@ -9,5 +9,7 @@ namespace TemplateStudioTest.Core.Contracts.Services;
 public interface ISerialService
 {
     public IEnumerable<string> GetPortNames();
+    bool IsConnected();
     bool TryConnect(SerialModel serialModel);
+    bool TryDisconnect();
 }

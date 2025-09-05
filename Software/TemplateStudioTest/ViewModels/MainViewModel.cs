@@ -1,6 +1,7 @@
 ﻿using System.IO.Ports;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using TemplateStudioTest.Core.Contracts.Services;
 using TemplateStudioTest.Core.Models;
 using TemplateStudioTest.Helpers;
@@ -24,7 +25,9 @@ public partial class MainViewModel : ObservableRecipient
     [ObservableProperty] private StopBits selectedStopBits;
     [ObservableProperty] private int selectedDataBits;
 
-    [ObservableProperty] private string btnConnectText = "Connect.Text".GetLocalized();
+    public bool IsSerialConnected => Serial.IsConnected();
+
+    [ObservableProperty] private string btnConnectText = "Connect".GetLocalized();
     public MainViewModel(ISerialService serial)
     {
         Serial = serial;
@@ -45,7 +48,7 @@ public partial class MainViewModel : ObservableRecipient
         DataBits = [5, 6, 7, 8];
 
         SelectedPortName    = PortNames.FirstOrDefault()!;
-        SelectedDataBits    = BaudRates?[3] ?? BaudRates!.LastOrDefault()!;
+        SelectedDataBits    = DataBits?[3] ?? DataBits!.LastOrDefault()!;
         SelectedBaudRate    = BaudRates?[4] ?? BaudRates!.LastOrDefault()!;
         SelectedParity      = Parity.None;
         SelectedStopBits    = System.IO.Ports.StopBits.One;
@@ -53,19 +56,34 @@ public partial class MainViewModel : ObservableRecipient
     [RelayCommand]
     private void ConnectCOM()
     {
-        if (string.IsNullOrWhiteSpace(SelectedPortName))
-            return;
+        if (!IsSerialConnected)
+        {
+            if (string.IsNullOrWhiteSpace(SelectedPortName))
+                return;
 
-        var serialM = new SerialModel()
-        {
-            PortName = SelectedPortName,
-            BaudRates = SelectedBaudRate,
-            Parities = SelectedParity,
-            StopBits = SelectedStopBits
-        };
-        if (Serial.TryConnect(serialM))
-        {
-            BtnConnectText = "Disconnect.Text".GetLocalized();
+            var serialM = new SerialModel()
+            {
+                PortName = SelectedPortName,
+                BaudRates = SelectedBaudRate,
+                DataBits = SelectedDataBits,
+                Parities = SelectedParity,
+                StopBits = SelectedStopBits
+            };
+            if (Serial.TryConnect(serialM))
+            {
+                OnPropertyChanged(nameof(IsSerialConnected));
+                BtnConnectText = "Disconnect".GetLocalized();
+            }
         }
+        else
+        {
+            if (Serial.TryDisconnect())
+            {
+                OnPropertyChanged(nameof(IsSerialConnected));
+                BtnConnectText = "Connect".GetLocalized();
+            }
+        }
+
     }
+    
 }

@@ -8,9 +8,24 @@ using System.Threading.Tasks;
 namespace TemplateStudioTest.Core.Models;
 public class SerialModel
 {
-    public string PortName;
-    public int BaudRates;
-    public Parity Parities;
-    public StopBits StopBits;
-    public int DataBits;
+    public string PortName
+    {
+        get; set;
+    }
+    public int BaudRates 
+    {
+        get; set;
+    }
+    public Parity Parities
+    {
+        get; set;
+    }
+    public StopBits StopBits 
+    {
+        get; set;
+    }
+    public int DataBits 
+    {
+        get; set;
+    }
 }

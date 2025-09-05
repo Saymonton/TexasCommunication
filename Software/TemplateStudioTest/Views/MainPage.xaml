@@ -22,7 +22,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="25" />
                     <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -45,9 +45,9 @@
                     Grid.Column="2"
                     Width="100"
                     DropDownOpened="ComboBoxPortNames_DropDownOpened"
+                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
                     ItemsSource="{Binding PortNames}"
-                    SelectedItem="{Binding SelectedPortName}" />
-
+                    SelectedItem="{Binding SelectedPortName, Mode=TwoWay}" />
                 <TextBlock
                     Grid.Row="1"
                     Grid.Column="0"
@@ -59,8 +59,9 @@
                     Grid.Column="2"
                     Width="100"
                     Margin="{StaticResource XSmallTopMargin}"
+                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
                     ItemsSource="{Binding BaudRates}"
-                    SelectedItem="{Binding SelectedBaudRate}" />
+                    SelectedItem="{Binding SelectedBaudRate, Mode=TwoWay}" />
                 <TextBlock
                     Grid.Row="2"
                     Grid.Column="0"
@@ -72,8 +73,9 @@
                     Grid.Column="2"
                     Width="100"
                     Margin="{StaticResource XSmallTopMargin}"
+                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
                     ItemsSource="{Binding DataBits}"
-                    SelectedItem="{Binding SelectedDataBits}" />
+                    SelectedItem="{Binding SelectedDataBits, Mode=TwoWay}" />
                 <TextBlock
                     Grid.Row="3"
                     Grid.Column="0"
@@ -85,8 +87,9 @@
                     Grid.Column="2"
                     Width="100"
                     Margin="{StaticResource XSmallTopMargin}"
+                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
                     ItemsSource="{Binding Parities}"
-                    SelectedItem="{Binding SelectedParity}" />
+                    SelectedItem="{Binding SelectedParity, Mode=TwoWay}" />
                 <TextBlock
                     Grid.Row="4"
                     Grid.Column="0"
@@ -98,11 +101,13 @@
                     Grid.Column="2"
                     Width="100"
                     Margin="{StaticResource XSmallTopMargin}"
+                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
                     ItemsSource="{Binding StopBits}"
-                    SelectedItem="{Binding SelectedStopBits}" />
+                    SelectedItem="{Binding SelectedStopBits, Mode=TwoWay}" />
                 <Button
                     Grid.Row="5"
                     Grid.Column="0"
+                    Grid.ColumnSpan="3"
                     Margin="{StaticResource XSmallTopMargin}"
                     Command="{Binding ConnectCOMCommand}"
                     Content="{Binding BtnConnectText}" />

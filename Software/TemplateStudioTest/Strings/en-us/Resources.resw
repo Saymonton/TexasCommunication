@@ -179,4 +179,7 @@
   <data name="Disconnect" xml:space="preserve">
     <value>Disconnect</value>
   </data>
+  <data name="SerialError" xml:space="preserve">
+    <value>An error occurred while trying to perform the operation:</value>
+  </data>
 </root>

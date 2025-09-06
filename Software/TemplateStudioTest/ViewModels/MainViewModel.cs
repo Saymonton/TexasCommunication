@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using TemplateStudioTest.Contracts.Services;
 using TemplateStudioTest.Core.Contracts.Services;
 using TemplateStudioTest.Core.Models;
 using TemplateStudioTest.Helpers;
@@ -38,8 +39,10 @@ public partial class MainViewModel : ObservableRecipient
     [ObservableProperty] private SolidColorBrush led_1_Foreground = new (Colors.White);
     [ObservableProperty] private SolidColorBrush led_2_Foreground = new (Colors.White);
     [ObservableProperty] private SolidColorBrush led_3_Foreground = new (Colors.White);
+    private readonly CancellationTokenSource cancellationTokenSource;
     public MainViewModel(ISerialService serial)
     {
+        cancellationTokenSource = new();
         Serial = serial;
         UpdatePortNames();
         LoadComboboxes();
@@ -57,7 +60,7 @@ public partial class MainViewModel : ObservableRecipient
         StopBits = (StopBits[])Enum.GetValues(typeof(StopBits));
         DataBits = [5, 6, 7, 8];
 
-        SelectedPortName    = PortNames.FirstOrDefault()!;
+        SelectedPortName    = PortNames.LastOrDefault()!;
         SelectedDataBits    = DataBits?[3] ?? DataBits!.LastOrDefault()!;
         SelectedBaudRate    = BaudRates?[4] ?? BaudRates!.LastOrDefault()!;
         SelectedParity      = Parity.None;
@@ -66,48 +69,54 @@ public partial class MainViewModel : ObservableRecipient
     [RelayCommand]
     private void ConnectCOM()
     {
-        if (!IsSerialConnected)
+        try
         {
-            if (string.IsNullOrWhiteSpace(SelectedPortName))
-                return;
-
-            var serialM = new SerialModel()
+            if (!IsSerialConnected)
             {
-                PortName = SelectedPortName,
-                BaudRates = SelectedBaudRate,
-                DataBits = SelectedDataBits,
-                Parities = SelectedParity,
-                StopBits = SelectedStopBits
-            };
-            if (Serial.TryConnect(serialM))
-            {
-                OnPropertyChanged(nameof(IsSerialConnected));
-                BtnConnectText = "Disconnect".GetLocalized();
+                if (string.IsNullOrWhiteSpace(SelectedPortName))
+                    return;
 
-                UpdateLedStatus();
+                var serialM = new SerialModel()
+                {
+                    PortName = SelectedPortName,
+                    BaudRates = SelectedBaudRate,
+                    DataBits = SelectedDataBits,
+                    Parities = SelectedParity,
+                    StopBits = SelectedStopBits
+                };
+                if (Serial.TryConnect(serialM))
+                {
+                    OnPropertyChanged(nameof(IsSerialConnected));
+                    BtnConnectText = "Disconnect".GetLocalized();
+
+                    UpdateLedStatus();
+                }
+            }
+            else
+            {
+                if (Serial.TryDisconnect())
+                {
+                    OnPropertyChanged(nameof(IsSerialConnected));
+                    BtnConnectText = "Connect".GetLocalized();
+
+                    UpdateLedsUI([0, 0, 0, 0]);
+                }
             }
         }
-        else
+        catch (Exception ex)
         {
-            if (Serial.TryDisconnect())
-            {
-                OnPropertyChanged(nameof(IsSerialConnected));
-                BtnConnectText = "Connect".GetLocalized();
-
-                UpdateLedsUI([0, 0, 0, 0]);
-            }
+            App.MainWindow.ShowMessageDialogAsync("SerialError".GetLocalized() + "\n" + ex.Message, "Error");
         }
-
     }
 
-    private void UpdateLedsUI(int[] ledsStatus)
+    private void UpdateLedsUI(byte[] ledsStatus)
     {
         Led_0_Foreground = ledsStatus[0] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
         Led_1_Foreground = ledsStatus[1] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
         Led_2_Foreground = ledsStatus[2] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
         Led_3_Foreground = ledsStatus[3] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
     }
-    private void UpdateLedsUI(int ledOnIndex)
+    private void UpdateLedsUI(byte ledOnIndex)
     {
         Led_0_Foreground = new SolidColorBrush(Colors.White);
         Led_1_Foreground = new SolidColorBrush(Colors.White);
@@ -121,15 +130,17 @@ public partial class MainViewModel : ObservableRecipient
             case 3: Led_3_Foreground = new SolidColorBrush(Colors.Red); break;
         }
     }
-    private void UpdateLedStatus()
+    private async void UpdateLedStatus()
     {
-        if (Serial.TryGetLedsStatus(out int[] ledsStatus))
+        (bool sucess, byte byteResponse) = await Serial.TryGetLedsStatus(cancellationTokenSource.Token);
+        if (sucess)
         {
-            UpdateLedsUI(ledsStatus);
+            UpdateLedsUI(byteResponse);
         }
         else
         {
             // Mostrar que não foi possível obter o status
+
         }
     }
 
@@ -139,7 +150,7 @@ public partial class MainViewModel : ObservableRecipient
         if (!IsSerialConnected) return;
         if(int.TryParse(ledIndex?.ToString(), out int index))
         {
-            UpdateLedsUI(index);
+            UpdateLedStatus();
         }
     }
 }

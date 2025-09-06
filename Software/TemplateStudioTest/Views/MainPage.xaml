@@ -126,7 +126,10 @@
             Orientation="Horizontal"
             Spacing="100">
             <StackPanel>
-                <Button Command="{Binding LedClickCommand}" CommandParameter="0">
+                <Button
+                    Command="{Binding LedClickCommand}"
+                    CommandParameter="0"
+                    IsEnabled="{Binding IsSerialConnected}">
                     <FontIcon
                         FontSize="64"
                         Foreground="{Binding Led_0_Foreground, Mode=TwoWay}"
@@ -138,7 +141,10 @@
                     Text="0" />
             </StackPanel>
             <StackPanel>
-                <Button Command="{Binding LedClickCommand}" CommandParameter="1">
+                <Button
+                    Command="{Binding LedClickCommand}"
+                    CommandParameter="1"
+                    IsEnabled="{Binding IsSerialConnected}">
                     <FontIcon
                         FontSize="64"
                         Foreground="{Binding Led_1_Foreground}"
@@ -151,7 +157,10 @@
             </StackPanel>
 
             <StackPanel>
-                <Button Command="{Binding LedClickCommand}" CommandParameter="2">
+                <Button
+                    Command="{Binding LedClickCommand}"
+                    CommandParameter="2"
+                    IsEnabled="{Binding IsSerialConnected}">
                     <FontIcon
                         FontSize="64"
                         Foreground="{Binding Led_2_Foreground}"
@@ -164,7 +173,10 @@
             </StackPanel>
 
             <StackPanel>
-                <Button Command="{Binding LedClickCommand}" CommandParameter="3">
+                <Button
+                    Command="{Binding LedClickCommand}"
+                    CommandParameter="3"
+                    IsEnabled="{Binding IsSerialConnected}">
                     <FontIcon
                         FontSize="64"
                         Foreground="{Binding Led_3_Foreground}"

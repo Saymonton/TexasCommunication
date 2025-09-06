@@ -22,16 +22,19 @@ public class SerialService : ISerialService
 
     public bool TryConnect(SerialModel serialModel)
     {
-        serialPort.PortName = serialModel.PortName;
-        serialPort.BaudRate = serialModel.BaudRates;
-        serialPort.DataBits = serialModel.DataBits;
-        serialPort.StopBits = serialModel.StopBits;
-        serialPort.Parity = serialModel.Parities;
+        if (!IsConnected() && SerialPort.GetPortNames().Contains(serialModel.PortName))
+        {
+            serialPort.PortName = serialModel.PortName;
+            serialPort.BaudRate = serialModel.BaudRates;
+            serialPort.DataBits = serialModel.DataBits;
+            serialPort.StopBits = serialModel.StopBits;
+            serialPort.Parity = serialModel.Parities;
 
-        if (IsConnected()) return false;
-
-        serialPort.Open();
-        return true;
+            serialPort.Open();
+            serialPort.BaseStream.Flush();
+            return true;
+        }
+        return false;
     }
 
     public bool TryDisconnect()

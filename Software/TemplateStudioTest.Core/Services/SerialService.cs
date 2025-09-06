@@ -48,4 +48,10 @@ public class SerialService : ISerialService
         serialPort.Close();
         return true;
     }
+
+    public bool TryGetLedsStatus(out int[] ledsStatus)
+    {
+        ledsStatus = new int[4] { 0, 1, 0, 0 };
+        return true;
+    }
 }

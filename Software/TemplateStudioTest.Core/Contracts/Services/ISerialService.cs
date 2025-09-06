@@ -12,4 +12,5 @@ public interface ISerialService
     bool IsConnected();
     bool TryConnect(SerialModel serialModel);
     bool TryDisconnect();
+    bool TryGetLedsStatus(out int[] ledsStatus);
 }

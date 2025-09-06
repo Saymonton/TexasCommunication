@@ -83,6 +83,8 @@ public partial class MainViewModel : ObservableRecipient
             {
                 OnPropertyChanged(nameof(IsSerialConnected));
                 BtnConnectText = "Disconnect".GetLocalized();
+
+                UpdateLedStatus();
             }
         }
         else
@@ -91,17 +93,53 @@ public partial class MainViewModel : ObservableRecipient
             {
                 OnPropertyChanged(nameof(IsSerialConnected));
                 BtnConnectText = "Connect".GetLocalized();
+
+                UpdateLedsUI([0, 0, 0, 0]);
             }
         }
 
     }
 
+    private void UpdateLedsUI(int[] ledsStatus)
+    {
+        Led_0_Foreground = ledsStatus[0] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
+        Led_1_Foreground = ledsStatus[1] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
+        Led_2_Foreground = ledsStatus[2] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
+        Led_3_Foreground = ledsStatus[3] == 1 ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.White);
+    }
+    private void UpdateLedsUI(int ledOnIndex)
+    {
+        Led_0_Foreground = new SolidColorBrush(Colors.White);
+        Led_1_Foreground = new SolidColorBrush(Colors.White);
+        Led_2_Foreground = new SolidColorBrush(Colors.White);
+        Led_3_Foreground = new SolidColorBrush(Colors.White);
+        switch (ledOnIndex)
+        {
+            case 0: Led_0_Foreground = new SolidColorBrush(Colors.Red); break;
+            case 1: Led_1_Foreground = new SolidColorBrush(Colors.Red); break;
+            case 2: Led_2_Foreground = new SolidColorBrush(Colors.Red); break;
+            case 3: Led_3_Foreground = new SolidColorBrush(Colors.Red); break;
+        }
+    }
+    private void UpdateLedStatus()
+    {
+        if (Serial.TryGetLedsStatus(out int[] ledsStatus))
+        {
+            UpdateLedsUI(ledsStatus);
+        }
+        else
+        {
+            // Mostrar que não foi possível obter o status
+        }
+    }
+
     [RelayCommand]
     private void LedClick(object ledIndex)
     {
+        if (!IsSerialConnected) return;
         if(int.TryParse(ledIndex?.ToString(), out int index))
         {
-            // Comunicar com a placa
+            UpdateLedsUI(index);
         }
     }
 }

@@ -14,7 +14,12 @@
     </Page.Resources>
 
     <Grid x:Name="ContentArea">
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="200" />
+        </Grid.RowDefinitions>
         <Expander Width="250" VerticalAlignment="Top">
             <Expander.Header>
                 <TextBlock x:Uid="COM_Config" />
@@ -114,6 +119,62 @@
             </Grid>
         </Expander>
 
+        <StackPanel
+            Grid.Row="2"
+            Margin="{StaticResource MediumTopBottomMargin}"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="100">
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}" CommandParameter="0">
+                    <FontIcon
+                        FontSize="64"
+                        Foreground="{Binding Led_0_Foreground, Mode=TwoWay}"
+                        Glyph="&#xE781;" />
+                </Button>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    Text="0" />
+            </StackPanel>
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}" CommandParameter="1">
+                    <FontIcon
+                        FontSize="64"
+                        Foreground="{Binding Led_1_Foreground}"
+                        Glyph="&#xE781;" />
+                </Button>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    Text="1" />
+            </StackPanel>
 
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}" CommandParameter="2">
+                    <FontIcon
+                        FontSize="64"
+                        Foreground="{Binding Led_2_Foreground}"
+                        Glyph="&#xE781;" />
+                </Button>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    Text="2" />
+            </StackPanel>
+
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}" CommandParameter="3">
+                    <FontIcon
+                        FontSize="64"
+                        Foreground="{Binding Led_3_Foreground}"
+                        Glyph="&#xE781;" />
+                </Button>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    Text="3" />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>

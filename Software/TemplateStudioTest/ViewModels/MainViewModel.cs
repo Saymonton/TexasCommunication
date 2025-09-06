@@ -1,7 +1,10 @@
-﻿using System.IO.Ports;
+﻿using System.Drawing;
+using System.IO.Ports;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using TemplateStudioTest.Core.Contracts.Services;
 using TemplateStudioTest.Core.Models;
 using TemplateStudioTest.Helpers;
@@ -10,6 +13,7 @@ namespace TemplateStudioTest.ViewModels;
 
 public partial class MainViewModel : ObservableRecipient
 {
+    #region Serial Props
     [ObservableProperty]
     private ISerialService _serial;
 
@@ -28,6 +32,12 @@ public partial class MainViewModel : ObservableRecipient
     public bool IsSerialConnected => Serial.IsConnected();
 
     [ObservableProperty] private string btnConnectText = "Connect".GetLocalized();
+    #endregion
+
+    [ObservableProperty] private SolidColorBrush led_0_Foreground = new (Colors.White);
+    [ObservableProperty] private SolidColorBrush led_1_Foreground = new (Colors.White);
+    [ObservableProperty] private SolidColorBrush led_2_Foreground = new (Colors.White);
+    [ObservableProperty] private SolidColorBrush led_3_Foreground = new (Colors.White);
     public MainViewModel(ISerialService serial)
     {
         Serial = serial;
@@ -85,5 +95,13 @@ public partial class MainViewModel : ObservableRecipient
         }
 
     }
-    
+
+    [RelayCommand]
+    private void LedClick(object ledIndex)
+    {
+        if(int.TryParse(ledIndex?.ToString(), out int index))
+        {
+            // Comunicar com a placa
+        }
+    }
 }

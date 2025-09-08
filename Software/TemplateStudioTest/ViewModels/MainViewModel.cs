@@ -32,7 +32,7 @@ public partial class MainViewModel : ObservableRecipient
 
     public bool IsSerialConnected => Serial.IsConnected();
 
-    [ObservableProperty] private string btnConnectText = "Connect".GetLocalized();
+    public string BtnConnectText => IsSerialConnected ? "Disconnect".GetLocalized() : "Connect".GetLocalized();
     #endregion
 
     [ObservableProperty] private SolidColorBrush led_0_Foreground = new (Colors.White);
@@ -87,7 +87,7 @@ public partial class MainViewModel : ObservableRecipient
                 if (Serial.TryConnect(serialM))
                 {
                     OnPropertyChanged(nameof(IsSerialConnected));
-                    BtnConnectText = "Disconnect".GetLocalized();
+                    OnPropertyChanged(nameof(BtnConnectText));
 
                     UpdateLedStatus();
                 }
@@ -97,7 +97,7 @@ public partial class MainViewModel : ObservableRecipient
                 if (Serial.TryDisconnect())
                 {
                     OnPropertyChanged(nameof(IsSerialConnected));
-                    BtnConnectText = "Connect".GetLocalized();
+                    OnPropertyChanged(nameof(BtnConnectText));
 
                     UpdateLedsUI([0, 0, 0, 0]);
                 }

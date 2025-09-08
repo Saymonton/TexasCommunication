@@ -88,8 +88,9 @@ public partial class MainViewModel : ObservableRecipient
                 {
                     OnPropertyChanged(nameof(IsSerialConnected));
                     OnPropertyChanged(nameof(BtnConnectText));
+                    Serial.OnLedsStatusReceived += Serial_OnLedsStatusReceived;
 
-                    UpdateLedStatus();
+                    GetLedStatusAsync();
                 }
             }
             else
@@ -98,7 +99,7 @@ public partial class MainViewModel : ObservableRecipient
                 {
                     OnPropertyChanged(nameof(IsSerialConnected));
                     OnPropertyChanged(nameof(BtnConnectText));
-
+                    Serial.OnLedsStatusReceived -= Serial_OnLedsStatusReceived;
                     UpdateLedsUI([0, 0, 0, 0]);
                 }
             }
@@ -107,6 +108,11 @@ public partial class MainViewModel : ObservableRecipient
         {
             App.MainWindow.ShowMessageDialogAsync("SerialError".GetLocalized() + "\n" + ex.Message, "Error");
         }
+    }
+
+    private void Serial_OnLedsStatusReceived(object? sender, byte e)
+    {
+        UpdateLedsUI(e);
     }
 
     private void UpdateLedsUI(byte[] ledsStatus)
@@ -130,12 +136,11 @@ public partial class MainViewModel : ObservableRecipient
             case 3: Led_3_Foreground = new SolidColorBrush(Colors.Red); break;
         }
     }
-    private async void UpdateLedStatus()
-    {
-        (bool sucess, byte byteResponse) = await Serial.TryGetLedsStatus(cancellationTokenSource.Token);
-        if (sucess)
+    private async void GetLedStatusAsync()
+    {       
+        if (Serial.TryGetLedsStatus())
         {
-            UpdateLedsUI(byteResponse);
+            //UpdateLedsUI(byteResponse);
         }
         else
         {
@@ -143,16 +148,15 @@ public partial class MainViewModel : ObservableRecipient
 
         }
     }
-    private async Task SetLedStatus(byte ledIndex)
-    {
-        (bool sucess, byte byteResponse) = await Serial.TrySetLedsStatus(cancellationTokenSource.Token, ledIndex);
-        if (sucess)
+    private void SetLedStatus(byte ledIndex)
+    {        
+        if (Serial.TrySetLedsStatus(ledIndex))
         {
-            UpdateLedsUI(byteResponse);
+           
         }
         else
         {
-
+            // Mostrar que não foi possível setar o led
         }
     }
 

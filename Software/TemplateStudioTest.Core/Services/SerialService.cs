@@ -6,6 +6,7 @@ namespace TemplateStudioTest.Core.Services;
 public class SerialService : ISerialService
 {
     private readonly SerialPort serialPort;
+    public event EventHandler<byte> OnLedsStatusReceived;
 
     public SerialService()
     {
@@ -45,7 +46,7 @@ public class SerialService : ISerialService
         return true;
     }
 
-    public async Task<(bool sucess, byte byteResponse)> TryGetLedsStatus(CancellationToken cancellationToken)
+    public bool TryGetLedsStatus()
     {
         byte HEADER_1 = 0xAA;
         byte HEADER_2 = 0x55;
@@ -83,16 +84,17 @@ public class SerialService : ISerialService
 
                 if (chksum == calc)
                 {
-                    return (true, data);
+                    OnLedsStatusReceived?.Invoke(this, data);
+                    return true;
                 }
             }            
         }
 
         while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
-        return (false, 0);
+        return false;
     }
 
-    public async Task<(bool sucess, byte byteResponse)> TrySetLedsStatus(CancellationToken cancellationToken, byte byteToChange)
+    public bool TrySetLedsStatus(byte byteToChange)
     {
         byte HEADER_1 = 0xAA;
         byte HEADER_2 = 0x55;
@@ -131,12 +133,13 @@ public class SerialService : ISerialService
 
                 if (chksum == calc)
                 {
-                    return (true, data);
+                    OnLedsStatusReceived?.Invoke(this, data);
+                    return true;
                 }
             }
         }
 
         while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
-        return (false, 0);
+        return false;
     }
 }

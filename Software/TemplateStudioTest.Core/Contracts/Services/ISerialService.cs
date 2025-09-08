@@ -8,9 +8,10 @@ using TemplateStudioTest.Core.Models;
 namespace TemplateStudioTest.Core.Contracts.Services;
 public interface ISerialService
 {
-    public IEnumerable<string> GetPortNames();
+    IEnumerable<string> GetPortNames();
     bool IsConnected();
     bool TryConnect(SerialModel serialModel);
     bool TryDisconnect();
-    public Task<Tuple<bool, byte>> TryGetLedsStatus(CancellationToken cancellationToken);
+    Task<(bool sucess, byte byteResponse)> TryGetLedsStatus(CancellationToken cancellationToken);
+    Task<(bool sucess, byte byteResponse)> TrySetLedsStatus(CancellationToken cancellationToken, byte byteToChange);
 }

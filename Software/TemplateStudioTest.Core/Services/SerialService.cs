@@ -45,19 +45,21 @@ public class SerialService : ISerialService
         return true;
     }
 
-    public async Task<Tuple<bool, byte>> TryGetLedsStatus(CancellationToken cancellationToken)
+    public async Task<(bool sucess, byte byteResponse)> TryGetLedsStatus(CancellationToken cancellationToken)
     {
-        byte[] ledsStatus = [ 0, 0, 0, 0 ];
         byte HEADER_1 = 0xAA;
         byte HEADER_2 = 0x55;
+        byte CMD      = 1;
+        byte LEN      = 0;
+        int  CHKSUM   = LEN + CMD;
         // Mensagem para solicitar o status dos LEDs
         byte[] message =
         [
             HEADER_1, // Header 1
             HEADER_2, // Header 2
-            0x01, // Comando
-            0x00, // Length dos dados
-            0x01  // Checksum Comando + Length dos dados + dados
+            CMD, // Comando
+            LEN, // Length dos dados
+            (byte)CHKSUM  // Checksum Comando + Length dos dados + dados
         ];
 
         // Limpar buffer
@@ -65,9 +67,9 @@ public class SerialService : ISerialService
 
         serialPort.Write(message, 0, message.Length);
 
-        await Task.Delay(50, cancellationToken);
+        while (serialPort.BytesToRead < 5) ;
 
-        if(serialPort.BytesToRead >= 5)
+        if (serialPort.BytesToRead >= 5)
         {
             while (serialPort.ReadByte() != HEADER_1) ;
             if (serialPort.ReadByte() == HEADER_2)
@@ -81,13 +83,60 @@ public class SerialService : ISerialService
 
                 if (chksum == calc)
                 {
-                    return new(true, data);
+                    return (true, data);
                 }
             }            
         }
 
-        serialPort.BaseStream.Flush();
-        await Task.Delay(50, cancellationToken);
-        return new(false, 0);
+        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+        return (false, 0);
+    }
+
+    public async Task<(bool sucess, byte byteResponse)> TrySetLedsStatus(CancellationToken cancellationToken, byte byteToChange)
+    {
+        byte HEADER_1 = 0xAA;
+        byte HEADER_2 = 0x55;
+        byte CMD = 2;
+        byte LEN = 1;
+        int CHKSUM = CMD + LEN + byteToChange;
+        // Mensagem para solicitar o status dos LEDs
+        byte[] message =
+        [
+            HEADER_1, // Header 1
+            HEADER_2, // Header 2
+            CMD, // Comando
+            LEN, // Length dos dados
+            byteToChange,   // Byte a ser alterado
+            (byte)CHKSUM  // Checksum Comando + Length dos dados + dados
+        ];
+        
+        // Limpar buffer
+        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+
+        serialPort.Write(message, 0, message.Length);
+
+        while (serialPort.BytesToRead < 5) ;
+
+        if (serialPort.BytesToRead >= 5)
+        {
+            while (serialPort.ReadByte() != HEADER_1) ;
+            if (serialPort.ReadByte() == HEADER_2)
+            {
+                byte cmd = (byte)serialPort.ReadByte();
+                byte len = (byte)serialPort.ReadByte();
+                byte data = (byte)serialPort.ReadByte();
+                byte chksum = (byte)serialPort.ReadByte();
+
+                int calc = cmd + len + data;
+
+                if (chksum == calc)
+                {
+                    return (true, data);
+                }
+            }
+        }
+
+        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+        return (false, 0);
     }
 }

@@ -143,14 +143,28 @@ public partial class MainViewModel : ObservableRecipient
 
         }
     }
+    private async Task SetLedStatus(byte ledIndex)
+    {
+        (bool sucess, byte byteResponse) = await Serial.TrySetLedsStatus(cancellationTokenSource.Token, ledIndex);
+        if (sucess)
+        {
+            UpdateLedsUI(byteResponse);
+        }
+        else
+        {
+
+        }
+    }
 
     [RelayCommand]
     private void LedClick(object ledIndex)
     {
         if (!IsSerialConnected) return;
-        if(int.TryParse(ledIndex?.ToString(), out int index))
+        if(int.TryParse(ledIndex?.ToString(), out int index) && index >= 0 && index <= 3)
         {
-            UpdateLedStatus();
+            SetLedStatus((byte)index);
+            //UpdateLedStatus();
         }
     }
+
 }

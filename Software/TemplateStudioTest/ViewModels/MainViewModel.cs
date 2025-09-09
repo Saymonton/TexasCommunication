@@ -136,8 +136,8 @@ public partial class MainViewModel : ObservableRecipient
     }
     private void UpdateLedsUI(byte ledOnIndex)
     {
-        byte[] leds = [4];
-        leds[ledOnIndex-1] = 1;
+        var leds = new byte[4];
+        leds[ledOnIndex] = 1;
         UpdateLedsUI(leds);
     }
     private void GetLedStatus()

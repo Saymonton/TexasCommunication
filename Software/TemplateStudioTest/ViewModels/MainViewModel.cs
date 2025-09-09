@@ -3,6 +3,7 @@ using System.IO.Ports;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using TemplateStudioTest.Contracts.Services;
@@ -17,6 +18,7 @@ public partial class MainViewModel : ObservableRecipient
     #region Serial Props
     [ObservableProperty]
     private ISerialService _serial;
+    private readonly DispatcherQueue _uiQueue;
 
     [ObservableProperty] private string[] portNames;
     [ObservableProperty] private int[] baudRates;
@@ -39,10 +41,10 @@ public partial class MainViewModel : ObservableRecipient
     [ObservableProperty] private SolidColorBrush led_1_Foreground = new (Colors.White);
     [ObservableProperty] private SolidColorBrush led_2_Foreground = new (Colors.White);
     [ObservableProperty] private SolidColorBrush led_3_Foreground = new (Colors.White);
-    private readonly CancellationTokenSource cancellationTokenSource;
+    private CancellationTokenSource cancellationTokenSource;
     public MainViewModel(ISerialService serial)
     {
-        cancellationTokenSource = new();
+        _uiQueue = DispatcherQueue.GetForCurrentThread();
         Serial = serial;
         UpdatePortNames();
         LoadComboboxes();
@@ -88,9 +90,9 @@ public partial class MainViewModel : ObservableRecipient
                 {
                     OnPropertyChanged(nameof(IsSerialConnected));
                     OnPropertyChanged(nameof(BtnConnectText));
-                    Serial.OnLedsStatusReceived += Serial_OnLedsStatusReceived;
-
-                    GetLedStatusAsync();
+                    Serial.OnLedsStatusReceived += Serial_OnLedsStatusReceived;                    
+                    GetLedStatus();
+                    StartMonitoringRoutine();
                 }
             }
             else
@@ -99,6 +101,7 @@ public partial class MainViewModel : ObservableRecipient
                 {
                     OnPropertyChanged(nameof(IsSerialConnected));
                     OnPropertyChanged(nameof(BtnConnectText));
+                    StopMonitoringRoutine();
                     Serial.OnLedsStatusReceived -= Serial_OnLedsStatusReceived;
                     UpdateLedsUI([0, 0, 0, 0]);
                 }
@@ -110,10 +113,19 @@ public partial class MainViewModel : ObservableRecipient
         }
     }
 
-    private void Serial_OnLedsStatusReceived(object? sender, byte e)
+    private void StartMonitoringRoutine()
     {
-        UpdateLedsUI(e);
+        cancellationTokenSource = new();
+        _ = Task.Run(() => Serial.StartMonitoringRoutine(cancellationTokenSource.Token));
     }
+        
+
+    private void StopMonitoringRoutine() =>
+        cancellationTokenSource.Cancel();
+
+    private void Serial_OnLedsStatusReceived(object? sender, byte data) =>
+        _uiQueue.TryEnqueue(() => UpdateLedsUI(data));
+    
 
     private void UpdateLedsUI(byte[] ledsStatus)
     {
@@ -124,19 +136,11 @@ public partial class MainViewModel : ObservableRecipient
     }
     private void UpdateLedsUI(byte ledOnIndex)
     {
-        Led_0_Foreground = new SolidColorBrush(Colors.White);
-        Led_1_Foreground = new SolidColorBrush(Colors.White);
-        Led_2_Foreground = new SolidColorBrush(Colors.White);
-        Led_3_Foreground = new SolidColorBrush(Colors.White);
-        switch (ledOnIndex)
-        {
-            case 0: Led_0_Foreground = new SolidColorBrush(Colors.Red); break;
-            case 1: Led_1_Foreground = new SolidColorBrush(Colors.Red); break;
-            case 2: Led_2_Foreground = new SolidColorBrush(Colors.Red); break;
-            case 3: Led_3_Foreground = new SolidColorBrush(Colors.Red); break;
-        }
+        byte[] leds = [4];
+        leds[ledOnIndex-1] = 1;
+        UpdateLedsUI(leds);
     }
-    private async void GetLedStatusAsync()
+    private void GetLedStatus()
     {       
         if (Serial.TryGetLedsStatus())
         {

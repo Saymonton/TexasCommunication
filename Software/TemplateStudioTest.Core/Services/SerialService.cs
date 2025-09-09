@@ -7,6 +7,9 @@ public class SerialService : ISerialService
 {
     private readonly SerialPort serialPort;
     public event EventHandler<byte> OnLedsStatusReceived;
+    private readonly object _locker = new();
+    private const byte HEADER_1 = 0xAA;
+    private const byte HEADER_2 = 0x55;
 
     public SerialService()
     {
@@ -48,8 +51,6 @@ public class SerialService : ISerialService
 
     public bool TryGetLedsStatus()
     {
-        byte HEADER_1 = 0xAA;
-        byte HEADER_2 = 0x55;
         byte CMD      = 1;
         byte LEN      = 0;
         int  CHKSUM   = LEN + CMD;
@@ -63,41 +64,42 @@ public class SerialService : ISerialService
             (byte)CHKSUM  // Checksum Comando + Length dos dados + dados
         ];
 
-        // Limpar buffer
-        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
-
-        serialPort.Write(message, 0, message.Length);
-
-        while (serialPort.BytesToRead < 5) ;
-
-        if (serialPort.BytesToRead >= 5)
+        lock (_locker)
         {
-            while (serialPort.ReadByte() != HEADER_1) ;
-            if (serialPort.ReadByte() == HEADER_2)
+            // Limpar buffer
+            while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+
+            serialPort.Write(message, 0, message.Length);
+
+            while (serialPort.BytesToRead < 5) ;
+
+            if (serialPort.BytesToRead >= 5)
             {
-                byte cmd = (byte)serialPort.ReadByte();
-                byte len = (byte)serialPort.ReadByte();
-                byte data = (byte)serialPort.ReadByte();
-                byte chksum = (byte)serialPort.ReadByte();
-
-                int calc = cmd + len + data;
-
-                if (chksum == calc)
+                while (serialPort.ReadByte() != HEADER_1) ;
+                if (serialPort.ReadByte() == HEADER_2)
                 {
-                    OnLedsStatusReceived?.Invoke(this, data);
-                    return true;
-                }
-            }            
-        }
+                    byte cmd = (byte)serialPort.ReadByte();
+                    byte len = (byte)serialPort.ReadByte();
+                    byte data = (byte)serialPort.ReadByte();
+                    byte chksum = (byte)serialPort.ReadByte();
 
-        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+                    int calc = cmd + len + data;
+
+                    if (chksum == calc)
+                    {
+                        OnDataReceived(data);
+                        return true;
+                    }
+                }
+            }
+
+            while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+        }
         return false;
     }
 
     public bool TrySetLedsStatus(byte byteToChange)
     {
-        byte HEADER_1 = 0xAA;
-        byte HEADER_2 = 0x55;
         byte CMD = 2;
         byte LEN = 1;
         int CHKSUM = CMD + LEN + byteToChange;
@@ -111,35 +113,83 @@ public class SerialService : ISerialService
             byteToChange,   // Byte a ser alterado
             (byte)CHKSUM  // Checksum Comando + Length dos dados + dados
         ];
-        
-        // Limpar buffer
-        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
 
-        serialPort.Write(message, 0, message.Length);
-
-        while (serialPort.BytesToRead < 5) ;
-
-        if (serialPort.BytesToRead >= 5)
+        lock (_locker)
         {
-            while (serialPort.ReadByte() != HEADER_1) ;
-            if (serialPort.ReadByte() == HEADER_2)
+            // Limpar buffer
+            while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+
+            serialPort.Write(message, 0, message.Length);
+
+            while (serialPort.BytesToRead < 5) ;
+
+            if (serialPort.BytesToRead >= 5)
             {
-                byte cmd = (byte)serialPort.ReadByte();
-                byte len = (byte)serialPort.ReadByte();
-                byte data = (byte)serialPort.ReadByte();
-                byte chksum = (byte)serialPort.ReadByte();
-
-                int calc = cmd + len + data;
-
-                if (chksum == calc)
+                while (serialPort.ReadByte() != HEADER_1) ;
+                if (serialPort.ReadByte() == HEADER_2)
                 {
-                    OnLedsStatusReceived?.Invoke(this, data);
-                    return true;
+                    byte cmd = (byte)serialPort.ReadByte();
+                    byte len = (byte)serialPort.ReadByte();
+                    byte data = (byte)serialPort.ReadByte();
+                    byte chksum = (byte)serialPort.ReadByte();
+
+                    int calc = cmd + len + data;
+
+                    if (chksum == calc)
+                    {
+                        OnDataReceived(data);
+                        return true;
+                    }
                 }
             }
-        }
 
-        while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+            while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+        }
         return false;
+    }
+
+    public async Task StartMonitoringRoutine(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            ReadSerial();
+            await Task.Delay(100, cancellationToken);
+        }
+    }
+    private void ReadSerial()
+    {
+        byte data = 0;
+        lock (_locker)
+        {
+            if (serialPort.BytesToRead < 6) return;
+            
+            while (serialPort.ReadByte() != HEADER_1 && serialPort.BytesToRead > 1) ;
+            if (serialPort.ReadByte() != HEADER_2)
+                return;
+        }
+        byte cmd = (byte)serialPort.ReadByte();
+        byte len = (byte)serialPort.ReadByte();
+        data = (byte)serialPort.ReadByte();
+        byte chksum = (byte)serialPort.ReadByte();
+
+        int calc = cmd + len + data;
+
+        if (chksum != calc) return;
+
+        OnDataReceived(data);        
+    }
+    protected virtual void OnDataReceived(byte data)
+    {
+        var handler = OnLedsStatusReceived;
+        if (handler is null) return;
+
+        try
+        {
+            handler(this, data);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Handler falhou: {ex}");
+        }
     }
 }

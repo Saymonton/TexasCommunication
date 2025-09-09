@@ -15,4 +15,5 @@ public interface ISerialService
     bool TryDisconnect();
     bool TryGetLedsStatus();
     bool TrySetLedsStatus(byte byteToChange);
+    Task StartMonitoringRoutine(CancellationToken cancellationToken);
 }

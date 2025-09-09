@@ -11,19 +11,112 @@
 
     <Grid>
         <Grid x:Name="AppTitleBar"
-              Canvas.ZIndex="1"
+              Canvas.ZIndex="1000"
               Height="{Binding ElementName=NavigationViewControl, Path=CompactPaneLength}"
-              IsHitTestVisible="True"
               VerticalAlignment="Top">
-            <Image Source="/Assets/WindowIcon.ico"
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <!-- ícone -->
+                <ColumnDefinition Width="*" />
+                <!-- drag/título -->
+                <ColumnDefinition Width="Auto" />
+                <!-- combo -->
+            </Grid.ColumnDefinitions>
+
+            <!-- ÁREA DE ARRASTO (title bar de verdade) -->
+            <Border x:Name="DragRegion"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Background="Transparent" />
+
+            <Image Grid.Column="0"
+                   Source="/Assets/WindowIcon.ico"
                    HorizontalAlignment="Left"
                    Width="16"
-                   Height="16" />
+                   Height="16"
+                   Margin="6,0,6,0" />
+
             <TextBlock x:Name="AppTitleBarText"
+                       Grid.Column="1"
                        VerticalAlignment="Center"
-                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"
                        Style="{StaticResource CaptionTextBlockStyle}"
-                       Margin="28,0,0,0"/>
+                       Text="Meu App" />
+
+            <!-- Fora da área de arrasto -->
+            <Button Grid.Column="2"
+                    Margin="0, 0, 150, 0"
+                    Content="COM Configurations">
+                <Button.Flyout>
+                    <Flyout Placement="TopEdgeAlignedRight">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="25" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Style="{ThemeResource BodyTextBlockStyle}"
+                                       Text="Port Name" />
+                            <ComboBox Grid.Row="0"
+                                      Grid.Column="2"
+                                      Width="100" />
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Style="{ThemeResource BodyTextBlockStyle}"
+                                       Text="Baud Rate" />
+                            <ComboBox Grid.Row="1"
+                                      Grid.Column="2"
+                                      Width="100" />
+                            <TextBlock Grid.Row="2"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Style="{ThemeResource BodyTextBlockStyle}"
+                                       Text="Data Bits" />
+                            <ComboBox Grid.Row="2"
+                                      Grid.Column="2"
+                                      Width="100"
+                                      Margin="{StaticResource XSmallTopMargin}" />
+                            <TextBlock Grid.Row="3"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Style="{ThemeResource BodyTextBlockStyle}"
+                                       Text="Parity" />
+                            <ComboBox Grid.Row="3"
+                                      Grid.Column="2"
+                                      Width="100"
+                                      Margin="{StaticResource XSmallTopMargin}" />
+                            <TextBlock Grid.Row="4"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Style="{ThemeResource BodyTextBlockStyle}"
+                                       Text="StopBits" />
+                            <ComboBox Grid.Row="4"
+                                      Grid.Column="2"
+                                      Width="100"
+                                      Margin="{StaticResource XSmallTopMargin}" />
+                            <Button Grid.Row="5"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Content="Connect"
+                                    Margin="{StaticResource XSmallTopMargin}" />
+                        </Grid>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
         </Grid>
         <NavigationView
             x:Name="NavigationViewControl"

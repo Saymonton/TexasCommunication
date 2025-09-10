@@ -33,10 +33,17 @@ public partial class LedControlViewModel : ObservableRecipient, IDisposable
     {
         _uiQueue = DispatcherQueue.GetForCurrentThread();
         Serial = serial;
+        InitializeProps();
         Serial.OnSerialConnected += Serial_OnSerialConnected;
         Serial.OnSerialDisconnected += Serial_OnSerialDisconnected;
     }
 
+    private void InitializeProps()
+    {
+        IsSerialConnected = Serial.IsConnected();
+        if (IsSerialConnected)
+            OnStart();
+    }
     private void Serial_OnSerialDisconnected(object? sender, EventArgs e) => OnStop();
     private void Serial_OnSerialConnected(object? sender, EventArgs e) => OnStart();
 

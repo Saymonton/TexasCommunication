@@ -8,7 +8,71 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid>
+    <Grid x:Name="ContentArea">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <ToggleSwitch IsEnabled="{Binding IsSerialConnected}" IsOn="{Binding IsToggleButtonOn, Mode=TwoWay}"></ToggleSwitch>
+        </StackPanel>
+        
+        <StackPanel VerticalAlignment="Center"
+                    Margin="{StaticResource MediumTopBottomMargin}"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Grid.Row="1"
+                    Spacing="100">
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}"
+                        CommandParameter="0"
+                        IsEnabled="{Binding IsButtonsEnabled}">
+                    <FontIcon FontSize="64"
+                              Foreground="{Binding Led_0_Foreground, Mode=TwoWay}"
+                              Glyph="&#xE781;" />
+                </Button>
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="18"
+                           Text="0" />
+            </StackPanel>
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}"
+                        CommandParameter="1"
+                        IsEnabled="{Binding IsButtonsEnabled}">
+                    <FontIcon FontSize="64"
+                              Foreground="{Binding Led_1_Foreground}"
+                              Glyph="&#xE781;" />
+                </Button>
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="18"
+                           Text="1" />
+            </StackPanel>
 
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}"
+                        CommandParameter="2"
+                        IsEnabled="{Binding IsButtonsEnabled}">
+                    <FontIcon FontSize="64"
+                              Foreground="{Binding Led_2_Foreground}"
+                              Glyph="&#xE781;" />
+                </Button>
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="18"
+                           Text="2" />
+            </StackPanel>
+
+            <StackPanel>
+                <Button Command="{Binding LedClickCommand}"
+                        CommandParameter="3"
+                        IsEnabled="{Binding IsButtonsEnabled}">
+                    <FontIcon FontSize="64"
+                              Foreground="{Binding Led_3_Foreground}"
+                              Glyph="&#xE781;" />
+                </Button>
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="18"
+                           Text="3" />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>

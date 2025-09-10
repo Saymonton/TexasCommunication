@@ -122,6 +122,5 @@ public partial class LedControlViewModel : ObservableRecipient, IDisposable
         }
     }
 
-
-    }
+    public void Dispose() => StopMonitoringRoutine();
 }

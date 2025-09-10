@@ -34,4 +34,12 @@ public sealed partial class LedControlPage : Page
         InitializeComponent();
         DataContext = ViewModel;
     }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+
+        if (ViewModel is IDisposable disposable)
+            disposable.Dispose();
+    }
 }

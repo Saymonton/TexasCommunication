@@ -13,12 +13,19 @@ public partial class LedControlViewModel : ObservableRecipient, IDisposable
     [ObservableProperty] private ISerialService _serial;
     private readonly DispatcherQueue _uiQueue;
     public bool IsButtonsEnabled => IsSerialConnected && IsToggleButtonOn;
-
-    [ObservableProperty] private bool isSerialConnected;
+    public bool IsSerialConnected => Serial.IsConnected();
     
     [ObservableProperty] private bool isToggleButtonOn = false;
     partial void OnIsToggleButtonOnChanged(bool value)
     {
+        if (value)
+        {
+            OnStart();
+        }
+        else
+        {
+            OnStop();
+        }
         OnPropertyChanged(nameof(IsButtonsEnabled));
     }
 
@@ -40,7 +47,7 @@ public partial class LedControlViewModel : ObservableRecipient, IDisposable
 
     private void InitializeProps()
     {
-        IsSerialConnected = Serial.IsConnected();
+        OnPropertyChanged(nameof(IsSerialConnected));
         if (IsSerialConnected)
             OnStart();
     }
@@ -50,14 +57,18 @@ public partial class LedControlViewModel : ObservableRecipient, IDisposable
     private void OnStart()
     {
         OnPropertyChanged(nameof(IsButtonsEnabled));
-        IsSerialConnected = true;
-        StartMonitoringRoutine();
-        GetLedStatus();
+        OnPropertyChanged(nameof(IsSerialConnected));
+        if (IsToggleButtonOn)
+        {            
+            StartMonitoringRoutine();
+            GetLedStatus();
+        }
+
     }
     private void OnStop()
     {
         OnPropertyChanged(nameof(IsButtonsEnabled));
-        IsSerialConnected = false;
+        OnPropertyChanged(nameof(IsSerialConnected));
         IsToggleButtonOn = false;
         StopMonitoringRoutine();        
         UpdateLedsUI([0, 0, 0, 0]);

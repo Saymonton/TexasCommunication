@@ -124,7 +124,7 @@
     <value>TemplateStudioTest</value>
   </data>
   <data name="Shell_Main.Content" xml:space="preserve">
-    <value>LED Control</value>
+    <value>Home</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
     <value>Personalization</value>
@@ -184,5 +184,8 @@
   </data>
   <data name="Shell_HexCommunication.Content" xml:space="preserve">
     <value>Hex Communication</value>
+  </data>
+  <data name="Shell_LedControl.Content" xml:space="preserve">
+    <value>LED Control</value>
   </data>
 </root>

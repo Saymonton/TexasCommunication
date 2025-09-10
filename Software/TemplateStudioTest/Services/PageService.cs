@@ -15,8 +15,9 @@ public class PageService : IPageService
     public PageService()
     {
         Configure<MainViewModel, MainPage>();
-        Configure<SettingsViewModel, SettingsPage>();
+        Configure<LedControlViewModel, LedControlPage>();
         Configure<HexCommunicationViewModel, HexCommunicationPage>();
+        Configure<SettingsViewModel, SettingsPage>();
     }
 
     public Type GetPageType(string key)

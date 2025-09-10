@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\HexCommunicationPage.xaml" />
+    <None Remove="Views\LedControlPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +38,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Views\LedControlPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\HexCommunicationPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

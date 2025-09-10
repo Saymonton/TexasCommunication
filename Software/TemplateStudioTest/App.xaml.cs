@@ -81,6 +81,8 @@ public partial class App : Application
             services.AddTransient<ShellViewModel>();
             services.AddTransient<HexCommunicationViewModel>();
             services.AddTransient<HexCommunicationPage>();
+            services.AddTransient<LedControlViewModel>();
+            services.AddTransient<LedControlPage>();
             
             // Configuration
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));

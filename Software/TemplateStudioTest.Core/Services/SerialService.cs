@@ -7,6 +7,8 @@ public class SerialService : ISerialService
 {
     private readonly SerialPort serialPort;
     public event EventHandler<byte> OnLedsStatusReceived;
+    public event EventHandler OnSerialConnected;
+    public event EventHandler OnSerialDisconnected;
     private readonly object _locker = new();
     private const byte HEADER_1 = 0xAA;
     private const byte HEADER_2 = 0x55;
@@ -35,6 +37,7 @@ public class SerialService : ISerialService
             serialPort.Parity = serialModel.Parities;
             serialPort.Open();
             while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
+            OnSerialConnected?.Invoke(this, null);
             return true;
         }        
         return false;
@@ -46,6 +49,7 @@ public class SerialService : ISerialService
         // Limpar o buffer
         while (serialPort.BytesToRead > 0) serialPort.ReadExisting();
         serialPort.Close();
+        OnSerialDisconnected?.Invoke(this, null);
         return true;
     }
 

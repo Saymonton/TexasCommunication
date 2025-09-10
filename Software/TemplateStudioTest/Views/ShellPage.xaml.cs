@@ -23,6 +23,7 @@ public sealed partial class ShellPage : Page
     {
         ViewModel = viewModel;
         InitializeComponent();
+        DataContext = viewModel;
 
         ViewModel.NavigationService.Frame = NavigationFrame;
         ViewModel.NavigationViewService.Initialize(NavigationViewControl);
@@ -81,5 +82,9 @@ public sealed partial class ShellPage : Page
         var result = navigationService.GoBack();
 
         args.Handled = result;
+    }
+    private void ComboBoxPortNames_DropDownOpened(object sender, object e)
+    {
+        ViewModel.UpdatePortNamesCommand.Execute(DataContext);
     }
 }

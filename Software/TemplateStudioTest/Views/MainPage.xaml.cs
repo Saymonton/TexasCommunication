@@ -17,9 +17,4 @@ public sealed partial class MainPage : Page
         InitializeComponent();
         DataContext = ViewModel;
     }
-
-    private void ComboBoxPortNames_DropDownOpened(object sender, object e)
-    {
-        ViewModel.UpdatePortNamesCommand.Execute(DataContext);
-    }
 }

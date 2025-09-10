@@ -9,6 +9,8 @@ namespace TemplateStudioTest.Core.Contracts.Services;
 public interface ISerialService
 {
     event EventHandler<byte> OnLedsStatusReceived;
+    event EventHandler OnSerialConnected;
+    event EventHandler OnSerialDisconnected;
     IEnumerable<string> GetPortNames();
     bool IsConnected();
     bool TryConnect(SerialModel serialModel);

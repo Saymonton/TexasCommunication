@@ -5,10 +5,17 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:helpers="using:TemplateStudioTest.Helpers"
+    xmlns:converters="using:TemplateStudioTest.Helpers"
     xmlns:behaviors="using:TemplateStudioTest.Behaviors"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     Loaded="OnLoaded">
 
+    <Page.Resources>
+        <ResourceDictionary>
+            <converters:BoolInverterConverter x:Key="BoolInverterConverter" />
+        </ResourceDictionary>
+    </Page.Resources>
+    
     <Grid>
         <Grid x:Name="AppTitleBar"
               Canvas.ZIndex="1000"
@@ -71,7 +78,11 @@
                                        Text="Port Name" />
                             <ComboBox Grid.Row="0"
                                       Grid.Column="2"
-                                      Width="100" />
+                                      Width="100"
+                                      DropDownOpened="ComboBoxPortNames_DropDownOpened"
+                                      IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
+                                      ItemsSource="{Binding PortNames}"
+                                      SelectedItem="{Binding SelectedPortName, Mode=TwoWay}" />
                             <TextBlock Grid.Row="1"
                                        Grid.Column="0"
                                        VerticalAlignment="Center"
@@ -79,7 +90,11 @@
                                        Text="Baud Rate" />
                             <ComboBox Grid.Row="1"
                                       Grid.Column="2"
-                                      Width="100" />
+                                      Width="100"
+                                      Margin="{StaticResource XSmallTopMargin}"
+                                      IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
+                                      ItemsSource="{Binding BaudRates}"
+                                      SelectedItem="{Binding SelectedBaudRate, Mode=TwoWay}" />
                             <TextBlock Grid.Row="2"
                                        Grid.Column="0"
                                        VerticalAlignment="Center"
@@ -88,7 +103,10 @@
                             <ComboBox Grid.Row="2"
                                       Grid.Column="2"
                                       Width="100"
-                                      Margin="{StaticResource XSmallTopMargin}" />
+                                      Margin="{StaticResource XSmallTopMargin}"
+                                      IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
+                                      ItemsSource="{Binding DataBits}"
+                                      SelectedItem="{Binding SelectedDataBits, Mode=TwoWay}" />
                             <TextBlock Grid.Row="3"
                                        Grid.Column="0"
                                        VerticalAlignment="Center"
@@ -97,7 +115,10 @@
                             <ComboBox Grid.Row="3"
                                       Grid.Column="2"
                                       Width="100"
-                                      Margin="{StaticResource XSmallTopMargin}" />
+                                      Margin="{StaticResource XSmallTopMargin}"
+                                      IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
+                                      ItemsSource="{Binding Parities}"
+                                      SelectedItem="{Binding SelectedParity, Mode=TwoWay}" />
                             <TextBlock Grid.Row="4"
                                        Grid.Column="0"
                                        VerticalAlignment="Center"
@@ -106,12 +127,16 @@
                             <ComboBox Grid.Row="4"
                                       Grid.Column="2"
                                       Width="100"
-                                      Margin="{StaticResource XSmallTopMargin}" />
+                                      Margin="{StaticResource XSmallTopMargin}"
+                                      IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
+                                      ItemsSource="{Binding StopBits}"
+                                      SelectedItem="{Binding SelectedStopBits, Mode=TwoWay}" />
                             <Button Grid.Row="5"
                                     Grid.Column="0"
                                     Grid.ColumnSpan="3"
-                                    Content="Connect"
-                                    Margin="{StaticResource XSmallTopMargin}" />
+                                    Margin="{StaticResource XSmallTopMargin}"
+                                    Command="{Binding ConnectCOMCommand}"
+                                    Content="{Binding BtnConnectText}" />
                         </Grid>
                     </Flyout>
                 </Button.Flyout>

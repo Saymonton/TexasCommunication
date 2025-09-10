@@ -7,120 +7,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Page.Resources>
-        <ResourceDictionary>
-            <converters:BoolInverterConverter x:Key="BoolInverterConverter" />
-        </ResourceDictionary>
-    </Page.Resources>
 
     <Grid x:Name="ContentArea">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="200" />
         </Grid.RowDefinitions>
-        <Expander Width="250" VerticalAlignment="Top">
-            <Expander.Header>
-                <TextBlock x:Uid="COM_Config" />
-            </Expander.Header>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="25" />
-                    <ColumnDefinition Width="100" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <TextBlock
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Port Name" />
-                <ComboBox
-                    Grid.Row="0"
-                    Grid.Column="2"
-                    Width="100"
-                    DropDownOpened="ComboBoxPortNames_DropDownOpened"
-                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
-                    ItemsSource="{Binding PortNames}"
-                    SelectedItem="{Binding SelectedPortName, Mode=TwoWay}" />
-                <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Baud Rate" />
-                <ComboBox
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    Width="100"
-                    Margin="{StaticResource XSmallTopMargin}"
-                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
-                    ItemsSource="{Binding BaudRates}"
-                    SelectedItem="{Binding SelectedBaudRate, Mode=TwoWay}" />
-                <TextBlock
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Data Bits" />
-                <ComboBox
-                    Grid.Row="2"
-                    Grid.Column="2"
-                    Width="100"
-                    Margin="{StaticResource XSmallTopMargin}"
-                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
-                    ItemsSource="{Binding DataBits}"
-                    SelectedItem="{Binding SelectedDataBits, Mode=TwoWay}" />
-                <TextBlock
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="Parity" />
-                <ComboBox
-                    Grid.Row="3"
-                    Grid.Column="2"
-                    Width="100"
-                    Margin="{StaticResource XSmallTopMargin}"
-                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
-                    ItemsSource="{Binding Parities}"
-                    SelectedItem="{Binding SelectedParity, Mode=TwoWay}" />
-                <TextBlock
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{ThemeResource BodyTextBlockStyle}"
-                    Text="StopBits" />
-                <ComboBox
-                    Grid.Row="4"
-                    Grid.Column="2"
-                    Width="100"
-                    Margin="{StaticResource XSmallTopMargin}"
-                    IsEnabled="{Binding IsSerialConnected, Converter={StaticResource BoolInverterConverter}}"
-                    ItemsSource="{Binding StopBits}"
-                    SelectedItem="{Binding SelectedStopBits, Mode=TwoWay}" />
-                <Button
-                    Grid.Row="5"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    Margin="{StaticResource XSmallTopMargin}"
-                    Command="{Binding ConnectCOMCommand}"
-                    Content="{Binding BtnConnectText}" />
-            </Grid>
-        </Expander>
 
         <StackPanel
-            Grid.Row="2"
+            VerticalAlignment="Center"
             Margin="{StaticResource MediumTopBottomMargin}"
             HorizontalAlignment="Center"
             Orientation="Horizontal"

@@ -188,4 +188,16 @@
   <data name="Shell_LedControl.Content" xml:space="preserve">
     <value>LED Control</value>
   </data>
+  <data name="On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="MultiLed" xml:space="preserve">
+    <value>Multi Led</value>
+  </data>
+  <data name="SingleLed" xml:space="preserve">
+    <value>Single Led</value>
+  </data>
 </root>

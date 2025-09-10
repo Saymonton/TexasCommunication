@@ -4,11 +4,23 @@ using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using TemplateStudioTest.Core.Contracts.Services;
+using TemplateStudioTest.Helpers;
 
 namespace TemplateStudioTest.ViewModels;
 
 public partial class LedControlViewModel : ObservableRecipient, IDisposable
 {
+    #region EasterEgg
+    private void EasterEgg()
+    {
+        ; ; ; ; ;  
+        ; ; 
+        ; ; 
+        ; ; ; ; ;
+              ; ;
+        ; ; ; ; ;
+    }
+    #endregion
     #region Serial Props
     [ObservableProperty] private ISerialService _serial;
     private readonly DispatcherQueue _uiQueue;
@@ -30,7 +42,19 @@ public partial class LedControlViewModel : ObservableRecipient, IDisposable
     }
 
     #endregion
+    public string ToggleBtnOnContent => "On".GetLocalized();
+    public string ToggleBtnOffContent => "Off".GetLocalized();
+    public string ToggleBtnOnSingleLedContent => "MultiLed".GetLocalized();
+    public string ToggleBtnOffSingleLedContent => "SingleLed".GetLocalized();
+    [ObservableProperty] private bool isToggleBtnLedModeOn = false;
+    partial void OnIsToggleBtnLedModeOnChanged(bool value)
+    {
+        if (!value)
+        {
 
+        }
+    }
+    
     [ObservableProperty] private SolidColorBrush led_0_Foreground = new(Colors.White);
     [ObservableProperty] private SolidColorBrush led_1_Foreground = new(Colors.White);
     [ObservableProperty] private SolidColorBrush led_2_Foreground = new(Colors.White);

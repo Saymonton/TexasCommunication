@@ -14,7 +14,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel>
-            <ToggleSwitch IsEnabled="{Binding IsSerialConnected}" IsOn="{Binding IsToggleButtonOn, Mode=TwoWay}"></ToggleSwitch>
+            <ToggleSwitch OnContent="{Binding ToggleBtnOnContent}" OffContent="{Binding ToggleBtnOffContent}" IsEnabled="{Binding IsSerialConnected}" IsOn="{Binding IsToggleButtonOn, Mode=TwoWay}"></ToggleSwitch>
+            <ToggleSwitch OnContent="{Binding ToggleBtnOnSingleLedContent}"
+                          OffContent="{Binding ToggleBtnOffSingleLedContent}"
+                          IsOn="{Binding IsToggleBtnLedModeOn, Mode=TwoWay}"
+                          IsEnabled="{Binding IsToggleButtonOn, Mode=OneWay}"/>
         </StackPanel>
         
         <StackPanel VerticalAlignment="Center"

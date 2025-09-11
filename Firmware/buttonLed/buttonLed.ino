@@ -8,6 +8,7 @@
 
 #define CMD_GET_STATUS 0x01
 #define CMD_SET_LED    0x02
+#define CMD_SET_MODE   0x03 // Set MultiLed status
 
 // Declaração de funções
 bool IsButtonUp(void);
@@ -20,7 +21,7 @@ bool processCommand(byte cmd, byte *data, byte len);
 
 // Declaração de variáveis
 bool stillPressed = false;
-bool multiLed = true;
+bool multiLed = false;
 uint8_t currentLEDActive = 0;
 uint8_t currentMultiLEDsActive = 0;
 unsigned long lastMillis = 0;
@@ -179,8 +180,32 @@ bool processCommand(byte cmd, uint8_t *data, byte len)
           Serial.println("Package error: Value received is greater than 0x0F!");
           return false;
       }
-
-    }  
+    }
+    else if(cmd == CMD_SET_MODE)
+    {
+      if(data[0] <= 1)
+      {
+        if(data[0] == 0)
+        {
+          multiLed = false;
+          // Deixar só um led aceso
+          
+          sendPacket(CMD_SET_MODE, &currentMultiLEDsActive, 1);
+          return true;
+        }
+        else
+        {
+          // Já está Habilitado
+          Serial.println("Invalid Argument: MultiLed is already enabled!");
+          return false;
+        }
+      }
+      else
+      {
+        Serial.println("Package error: Set-mode data should be 1 or 0!");
+        return false;
+      }
+    }
   }
   else
   {
@@ -192,6 +217,33 @@ bool processCommand(byte cmd, uint8_t *data, byte len)
       currentLEDActive = data[0] % 4; // força 0..3
       sendPacket(CMD_SET_LED, (byte*)&currentLEDActive, 1);
       return true;
+    }
+    else if(cmd == CMD_SET_MODE)
+    {
+      if(data[0] <= 1)
+      {
+        if(data[0] == 1)
+        {
+          multiLed = true;
+          // Pega o led que ja tava aceso.
+          currentMultiLEDsActive = 0;
+          currentMultiLEDsActive |= (1 << currentLEDActive);
+          
+          sendPacket(CMD_SET_MODE, &currentMultiLEDsActive, 1);
+          return true;
+        }
+        else
+        {
+          // Já está desabilitado
+          Serial.println("Invalid Argument: MultiLed is already disabled!");
+          return false;
+        }
+      }
+      else
+      {
+        Serial.println("Package error: Set-mode data should be 1 or 0!");
+        return false;
+      }
     }
   }
   return false;

@@ -1,4 +1,5 @@
 #include "tm4c1294ncpdt.h"
+#include <stdint.h>
 #define GPIO_LOCK_KEY 0x4C4F434B
 
 // Communication
@@ -19,7 +20,9 @@ bool processCommand(byte cmd, byte *data, byte len);
 
 // Declaração de variáveis
 bool stillPressed = false;
-int currentLEDActive = 0;
+bool multiLed = true;
+uint8_t currentLEDActive = 0;
+uint8_t currentMultiLEDsActive = 0;
 unsigned long lastMillis = 0;
 const long interval = 200;
 
@@ -64,10 +67,30 @@ void setup() {
 }
 
 void loop() {
-  ReadSerial(); 
-
-  // put your main code here, to run repeatedly:
+  ReadSerial();
   unsigned long millisNow = millis();
+  if (multiLed)
+  {
+    if (millisNow - lastMillis >= interval)
+    {
+      lastMillis = millisNow;
+      // bit0 de currentLEDActive -> bit1 de GPIO_PORTN
+      GPIO_PORTN_DATA_R = (GPIO_PORTN_DATA_R & ~(1u << 1)) | (((currentMultiLEDsActive >> 0) & 1u) << 1);
+
+      // bit1 de currentLEDActive -> bit0 de GPIO_PORTN
+      GPIO_PORTN_DATA_R = (GPIO_PORTN_DATA_R & ~(1u << 0)) | (((currentMultiLEDsActive >> 1) & 1u) << 0);
+
+      // bit2 de currentLEDActive -> bit4 de GPIO_PORTF_AHB
+      GPIO_PORTF_AHB_DATA_R = (GPIO_PORTF_AHB_DATA_R & ~(1u << 4)) | (((currentMultiLEDsActive >> 2) & 1u) << 4);
+
+      // bit3 de currentLEDActive -> bit0 de GPIO_PORTF_AHB
+      GPIO_PORTF_AHB_DATA_R = (GPIO_PORTF_AHB_DATA_R & ~(1u << 0)) | (((currentMultiLEDsActive >> 3) & 1u) << 0);
+    }
+
+    return;
+  }
+  // put your main code here, to run repeatedly:
+
   if (!IsButtonUp() && !stillPressed && (millisNow - lastMillis >= interval))
   {
     lastMillis = millisNow;
@@ -106,7 +129,7 @@ void ReadSerial(void)
       byte len = Serial.read();
 
       // Lê dados
-      byte data[16]; // limite arbitrário
+      uint8_t data[16]; // limite arbitrário
       for (int i = 0; i < len; i++) {
         while (!Serial.available()); // espera dado
         data[i] = Serial.read();
@@ -131,28 +154,52 @@ void ReadSerial(void)
     }
   }
 }
-
-// ================= Processamento =================
-
-bool processCommand(byte cmd, byte *data, byte len) 
+bool IsValidData(uint8_t data)
 {
-  if (cmd == CMD_GET_STATUS) {
-    sendPacket(CMD_GET_STATUS, (byte*)&currentLEDActive, 1);
-  }
-  else if (cmd == CMD_SET_LED && len == 1) {
-    currentLEDActive = data[0] % 4; // força 0..3
-    sendPacket(CMD_SET_LED, (byte*)&currentLEDActive, 1);
+  return data <= 0x0F; // Só aceita 0..15 no caso os 4 bits menos significantes
+}
+// ================= Processamento =================
+bool processCommand(byte cmd, uint8_t *data, byte len) 
+{
+  if(multiLed)
+  {
+    if (cmd == CMD_GET_STATUS) {
+      sendPacket(CMD_GET_STATUS, &currentMultiLEDsActive, 1);
+      return true;
+    }
+    else if (cmd == CMD_SET_LED && len == 1 && IsValidData(*data)) {
+      if(IsValidData(*data))
+      {
+          currentMultiLEDsActive = *data;
+          sendPacket(CMD_SET_LED, &currentMultiLEDsActive, 1);
+          return true;
+      }
+      else
+      {
+          Serial.println("Package error: Value received is greater than 0x0F!");
+          return false;
+      }
+
+    }  
   }
   else
   {
-    return false;
+    if (cmd == CMD_GET_STATUS) {
+      sendPacket(CMD_GET_STATUS, (byte*)&currentLEDActive, 1);
+      return true;
+    }
+    else if (cmd == CMD_SET_LED && len == 1) {
+      currentLEDActive = data[0] % 4; // força 0..3
+      sendPacket(CMD_SET_LED, (byte*)&currentLEDActive, 1);
+      return true;
+    }
   }
-  return true;
+  return false;
 }
 
 // ================= Envio de Pacote =================
 
-void sendPacket(byte cmd, byte *data, byte len) {
+void sendPacket(byte cmd, uint8_t *data, byte len) {
   byte checksum = cmd + len;
   for (int i = 0; i < len; i++) checksum += data[i];
 

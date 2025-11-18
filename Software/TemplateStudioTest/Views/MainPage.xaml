@@ -9,6 +9,6 @@
 
 
     <Grid>
-        
+        <ToggleButton Content="Mostrando pontos"/>
     </Grid>
 </Page>
